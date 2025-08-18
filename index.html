@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Bubble Pop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="game-ui" style="display: none;">
+            <div id="score-level-container">
+                <div id="score">Pontos: 0</div>
+                <div id="levelDisplay">Nível: 1</div>
+            </div>
+            <div id="lives">❤️❤️❤️❤️❤️</div>
+            <div id="pauseButton">||</div>
+        </div>
+
+        <div id="menu" class="screen">
+            <h1>Bubble Pop</h1>
+            <button id="playButton">Jogar</button>
+            <button id="aboutButton">Sobre</button> 
+        </div>
+
+        <div id="difficultyScreen" class="screen" style="display: none;">
+            <h1>Escolha a Dificuldade</h1>
+            <button id="easyButton">Fácil</button>
+            <button id="normalButton">Normal</button>
+            <button id="hardButton">Difícil</button>
+            <button id="backToMenuButton">Voltar</button>
+        </div>
+
+        <div id="gameOverScreen" class="screen" style="display: none;">
+            <h1>Fim de Jogo</h1>
+            <p>Sua pontuação final foi: <span id="finalScore">0</span></p>
+            <p>Você alcançou o Nível: <span id="finalLevel">1</span></p> 
+            <button id="restartButton">Jogar Novamente</button>
+        </div>
+
+        <div id="pauseMenu" class="screen" style="display: none;">
+            <h1>Pausado</h1>
+            <button id="resumeButton">Continuar</button>
+            <button id="restartFromPauseButton">Reiniciar</button>
+            <button id="menuButton">Menu Principal</button>
+        </div>
+
+        <div id="aboutScreen" class="screen" style="display: none;">
+            <h1>Sobre o Jogo</h1>
+            <p class="about-text">
+                Desenvolvido para estudo por <strong>João Pedro</strong>.
+            </p>
+
+            <div class="social-icons">
+                <a href="https://github.com/jp-brito" target="_blank" title="GitHub">
+                    <i class="fa-brands fa-github"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/jp-brito/" target="_blank" title="LinkedIn">
+                    <i class="fa-brands fa-linkedin"></i>
+                </a>
+            </div>
+
+            <p class="about-text">
+                <strong>Como jogar:</strong> Toque nas bolhas coloridas para as estourar e ganhar 
+                pontos. Se deixar uma bolha escapar, perde um coração. O jogo termina quando ficar sem 
+                corações. A dificuldade aumenta a cada 100 pontos!
+            </p>
+            <button id="closeAboutButton">Voltar</button>
+        </div>         
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
