@@ -18,7 +18,7 @@ body {
 
 /* A tela do jogo */
 canvas {
-    background-color: #838181; /* Um fundo azul para o céu */
+    background-color: rgba(0, 0, 0, 0.7);
     display: block;
 }
 
