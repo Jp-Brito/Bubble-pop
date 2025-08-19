@@ -39,10 +39,14 @@ canvas.height = window.innerHeight;
 let score = 0;
 let lives = 5;
 let bubbles = []; // Array para guardar todas as bolhas
+let particles = [];
 let isGameOver = true;
 let isPaused = false; // Variável de estado para a pausa
 let spawnInterval; // Variável para controlar o intervalo de criação de bolhas
 let currentDifficulty = 'normal';
+let cannonRecoil = 0;
+let currentCannonAngle = 0;
+let targetCannonAngle = 0;
 
 // VARIÁVEIS DE DIFICULDADE
 let difficultyLevel = 1;
@@ -73,6 +77,36 @@ class Bubble {
     }
 }
 
+class Particle {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.size = Math.random() * 5 + 2; // Tamanho entre 2 e 7
+        this.speedX = Math.random() * 6 - 3; // Velocidade horizontal aleatória (-3 a +3)
+        this.speedY = Math.random() * 6 - 3; // Velocidade vertical aleatória (-3 a +3)
+        this.life = 1; // Tempo de vida da partícula (1 = 100%)
+    }
+
+    // Atualiza a posição e o tempo de vida
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.life -= 0.04; // Desvanece gradualmente
+    }
+
+    // Desenha a partícula no canvas
+    draw() {
+        ctx.save(); // Salva o estado atual do canvas
+        ctx.globalAlpha = this.life; // Define a transparência (para o efeito de desvanecer)
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.restore(); // Restaura o estado anterior do canvas
+    }
+}
+
 function spawnBubble() {
     bubbles.push(new Bubble());
 }
@@ -93,14 +127,42 @@ function handleBubbles() {
     }
 }
 
+function handleParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw();
+
+        // Se a partícula já "morreu" (vida < 0), remove-a do array
+        if (particles[i].life <= 0) {
+            particles.splice(i, 1);
+        }
+    }
+}
+
 function gameLoop() {
     if (isGameOver || isPaused) return;
 
+    // Limpa o canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Desenha e atualiza as bolhas
     handleBubbles();
+
+    // Desenha e atualiza as partículas da explosão
+    handleParticles();
+
+    // Desenha o canhão
+    currentCannonAngle += (targetCannonAngle - currentCannonAngle) * 0.1;
+    targetCannonAngle *= 0.95;
+    if (cannonRecoil > 0) {
+        cannonRecoil -= 1;
+    }
+    
+    drawCannon();
+
+    // Pede a próxima frame de animação
     requestAnimationFrame(gameLoop);
 }
-
 function updateUI() {
     // Atualiza a pontuação
     scoreDisplay.textContent = `Pontos: ${score}`;
@@ -206,28 +268,78 @@ function increaseDifficulty() {
     spawnInterval = setInterval(spawnBubble, spawnRate);
 }
 
+
 function handleInteraction(clickX, clickY) {
     if (isGameOver || isPaused) return;
-
     for (let i = bubbles.length - 1; i >= 0; i--) {
         const bubble = bubbles[i];
         const distance = Math.sqrt((clickX - bubble.x) ** 2 + (clickY - bubble.y) ** 2);
         
         if (distance < bubble.radius) {
+            createBurst(bubble);
+            cannonRecoil = 20;
+
+            // ADICIONAR ESTA LÓGICA DE CÁLCULO DE ÂNGULO
+            const cannonX = canvas.width / 2;
+            const deltaX = bubble.x - cannonX;
+            const deltaY = canvas.height - bubble.y; // Y é invertido no canvas
+            targetCannonAngle = Math.atan2(deltaX, deltaY);
+
             bubbles.splice(i, 1);
             score += 10;
-
-            // A cada 100 pontos, aumenta a dificuldade
             if (score > 0 && score % 100 === 0) {
                 increaseDifficulty();
+            } else {
+                updateUI();
             }
-
-            updateUI();
             break;
         }
     }
 }
 
+function createBurst(bubble) {
+    // Cria 15 partículas para a explosão
+    for (let i = 0; i < 15; i++) {
+        particles.push(new Particle(bubble.x, bubble.y, bubble.color));
+    }
+}
+
+function drawCannon() {
+    const cannonBaseX = canvas.width / 2;
+    const cannonBaseY = canvas.height;
+    
+    // Salva o estado do canvas (posição, rotação, etc.)
+    ctx.save();
+    
+    // 1. Translada o ponto de origem (0,0) do canvas para a base do canhão.
+    // A partir de agora, todas as operações de desenho e rotação acontecerão
+    // em torno deste ponto.
+    ctx.translate(cannonBaseX, cannonBaseY);
+    
+    // 2. Rotaciona o canvas pelo ângulo atual do canhão.
+    ctx.rotate(currentCannonAngle);
+
+    // 3. Desenha o canhão. Como já transladámos a origem, desenhamos
+    // o canhão como se a sua base estivesse em (0,0), apontando para cima (Y negativo).
+    const recoilOffset = -cannonRecoil;
+
+    // Base do canhão (agora em (0, -20))
+    ctx.fillStyle = '#333';
+    ctx.fillRect(-40, -20 + recoilOffset, 80, 20);
+
+    // Corpo do canhão
+    ctx.fillStyle = '#555';
+    ctx.beginPath();
+    ctx.moveTo(-20, 0 + recoilOffset);
+    ctx.lineTo(-30, -40 + recoilOffset);
+    ctx.lineTo(30, -40 + recoilOffset);
+    ctx.lineTo(20, 0 + recoilOffset);
+    ctx.fill();
+
+    // 4. Restaura o estado do canvas para a sua posição e rotação originais.
+    // Isto é CRUCIAL para que o resto do jogo (bolhas, partículas) não seja desenhado rotacionado.
+    ctx.restore();
+}
 // --- Event Listeners ---
 
 // O botão Jogar agora abre o menu de dificuldade
