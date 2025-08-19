@@ -31,6 +31,7 @@
         <div id="menu" class="screen">
             <img src="imagens/bubblepopL.png" alt="Logótipo do Bubble Pop">
             <h1>Bubble Pop</h1>
+            <p class="highscore-display">Recorde: <span id="highScoreMenu">0</span></p>
             <button id="playButton">Jogar</button>
             <button id="aboutButton">Sobre</button> 
         </div>
@@ -46,7 +47,9 @@
         <div id="gameOverScreen" class="screen" style="display: none;">
             <h1>Fim de Jogo</h1>
             <p>Sua pontuação final foi: <span id="finalScore">0</span></p>
-            <p>Você alcançou o Nível: <span id="finalLevel">1</span></p> 
+            <p class="highscore-display">Recorde: <span id="highScoreGameOver">0</span></p>
+            <p id="newHighScoreMessage" style="display: none;">🎉 NOVO RECORDE! 🎉</p>
+            <p>Você alcançou o Nível: <span id="finalLevel">1</span></p>
             <button id="restartButton">Jogar Novamente</button>
         </div>
 

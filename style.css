@@ -179,3 +179,24 @@ button {
 #backToMenuButton:hover {
     background-color: #7f8c8d;
 }
+
+.highscore-display {
+    font-size: 1.2em;
+    color: #f1c40f; /* Cor dourada para o recorde */
+    margin: 0 0 20px 0;
+    font-weight: bold;
+}
+
+#newHighScoreMessage {
+    font-size: 1.5em;
+    color: #2ecc71; /* Verde para celebrar */
+    font-weight: bold;
+    animation: pulse 1s infinite;
+}
+
+/* Animação para a mensagem de novo recorde */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}

@@ -42,6 +42,10 @@ const normalButton = document.getElementById('normalButton');
 const hardButton = document.getElementById('hardButton');
 const backToMenuButton = document.getElementById('backToMenuButton');
 
+const highScoreMenu = document.getElementById('highScoreMenu');
+const highScoreGameOver = document.getElementById('highScoreGameOver');
+const newHighScoreMessage = document.getElementById('newHighScoreMessage');
+
 // --- Configurações do Jogo ---
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -57,6 +61,8 @@ let currentDifficulty = 'normal';
 let cannonRecoil = 0;
 let currentCannonAngle = 0;
 let targetCannonAngle = 0;
+
+let highScore = 0;
 
 // VARIÁVEIS DE DIFICULDADE
 let difficultyLevel = 1;
@@ -235,6 +241,7 @@ function startGame() {
     gameOverScreen.style.display = 'none';
     pauseMenu.style.display = 'none';
     gameUi.style.display = 'flex';
+    newHighScoreMessage.style.display = 'none';
 
     updateUI();
     spawnInterval = setInterval(spawnBubble, spawnRate);
@@ -244,9 +251,20 @@ function startGame() {
 function endGame() {
     isGameOver = true;
     clearInterval(spawnInterval);
-    
+
+    highScoreGameOver.textContent = highScore;
+
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('bubblePopHighScore', highScore);
+        highScoreGameOver.textContent = highScore;
+        newHighScoreMessage.style.display = 'block';
+        highScoreMenu.textContent = highScore;
+    }
+
     finalScoreDisplay.textContent = score;
     finalLevelDisplay.textContent = difficultyLevel;
+
     gameOverScreen.style.display = 'flex';
     gameUi.style.display = 'none';
 }
@@ -311,7 +329,7 @@ function handleInteraction(clickX, clickY) {
 
 function createBurst(bubble) {
     // Cria 15 partículas para a explosão
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
         particles.push(new Particle(bubble.x, bubble.y, bubble.color));
     }
 }
@@ -352,8 +370,17 @@ function drawCannon() {
     // Isto é CRUCIAL para que o resto do jogo (bolhas, partículas) não seja desenhado rotacionado.
     ctx.restore();
 }
-// --- Event Listeners ---
 
+
+function loadHighScore() {
+    const savedHighScore = localStorage.getItem('bubblePopHighScore');
+    if (savedHighScore) {
+        highScore = parseInt(savedHighScore);
+    }
+    highScoreMenu.textContent = highScore;
+}
+
+// --- Event Listeners ---
 // O botão Jogar agora abre o menu de dificuldade
 playButton.addEventListener('click', () => {
     menu.style.display = 'none';
@@ -415,3 +442,4 @@ aboutButton.addEventListener('click', () => {
 closeAboutButton.addEventListener('click', () => {
     aboutScreen.style.display = 'none'; // Esconde a janela "Sobre"
 });
+loadHighScore();
