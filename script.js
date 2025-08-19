@@ -20,8 +20,15 @@ const finalScoreDisplay = document.getElementById('finalScore');
 const levelDisplay = document.getElementById('levelDisplay');
 const finalLevelDisplay = document.getElementById('finalLevel'); 
 
-const popSound = new Audio('sounds/pop.mp3');
-popSound.volume = 0.5;
+const audioPool = [];
+const poolSize = 10;
+let poolIndex = 0;
+
+for (let i = 0; i < poolSize; i++) {
+    const audio = new Audio('sounds/pop.mp3');
+    audio.volume = 0.5;
+    audioPool.push(audio);
+}
 
 // About
 const aboutButton = document.getElementById('aboutButton');
@@ -288,8 +295,8 @@ function handleInteraction(clickX, clickY) {
             const deltaY = canvas.height - bubble.y; // Y é invertido no canvas
             targetCannonAngle = Math.atan2(deltaX, deltaY);
 
-            popSound.currentTime = 0; // Reinicia o som para o início
-            popSound.play();
+            audioPool[poolIndex].play();
+            poolIndex = (poolIndex + 1) % poolSize;
 
             bubbles.splice(i, 1);
             score += 10;
