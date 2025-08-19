@@ -20,6 +20,9 @@ const finalScoreDisplay = document.getElementById('finalScore');
 const levelDisplay = document.getElementById('levelDisplay');
 const finalLevelDisplay = document.getElementById('finalLevel'); 
 
+const popSound = new Audio('sounds/pop.mp3');
+popSound.volume = 0.5;
+
 // About
 const aboutButton = document.getElementById('aboutButton');
 const aboutScreen = document.getElementById('aboutScreen');
@@ -157,7 +160,7 @@ function gameLoop() {
     if (cannonRecoil > 0) {
         cannonRecoil -= 1;
     }
-    
+
     drawCannon();
 
     // Pede a próxima frame de animação
@@ -284,6 +287,9 @@ function handleInteraction(clickX, clickY) {
             const deltaX = bubble.x - cannonX;
             const deltaY = canvas.height - bubble.y; // Y é invertido no canvas
             targetCannonAngle = Math.atan2(deltaX, deltaY);
+
+            popSound.currentTime = 0; // Reinicia o som para o início
+            popSound.play();
 
             bubbles.splice(i, 1);
             score += 10;
