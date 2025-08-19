@@ -107,13 +107,12 @@ class Particle {
 
     // Desenha a partícula no canvas
     draw() {
-        ctx.save(); // Salva o estado atual do canvas
-        ctx.globalAlpha = this.life; // Define a transparência (para o efeito de desvanecer)
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.save();
+        ctx.globalAlpha = this.life;
         ctx.fillStyle = this.color;
-        ctx.fill();
-        ctx.restore(); // Restaura o estado anterior do canvas
+        // Desenha um quadrado em vez de um círculo (mais rápido)
+        ctx.fillRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
+        ctx.restore();
     }
 }
 
@@ -312,7 +311,7 @@ function handleInteraction(clickX, clickY) {
 
 function createBurst(bubble) {
     // Cria 15 partículas para a explosão
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 10; i++) {
         particles.push(new Particle(bubble.x, bubble.y, bubble.color));
     }
 }
