@@ -6,6 +6,13 @@ body {
     background-color: #111;
 }
 
+#menu img {
+    max-width: 85%;
+    max-height: 40vh;
+    height: auto;
+    margin-bottom: 15px;
+}
+
 /* Container principal do jogo, centrado na tela */
 #game-container {
     position: relative;
