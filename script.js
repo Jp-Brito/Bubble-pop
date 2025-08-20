@@ -42,9 +42,12 @@ const normalButton = document.getElementById('normalButton');
 const hardButton = document.getElementById('hardButton');
 const backToMenuButton = document.getElementById('backToMenuButton');
 
-const highScoreMenu = document.getElementById('highScoreMenu');
 const highScoreGameOver = document.getElementById('highScoreGameOver');
 const newHighScoreMessage = document.getElementById('newHighScoreMessage');
+
+const easyHighScoreDisplay = document.querySelector('#easyButton .difficulty-highscore');
+const normalHighScoreDisplay = document.querySelector('#normalButton .difficulty-highscore');
+const hardHighScoreDisplay = document.querySelector('#hardButton .difficulty-highscore');
 
 // --- Configurações do Jogo ---
 canvas.width = window.innerWidth;
@@ -62,7 +65,11 @@ let cannonRecoil = 0;
 let currentCannonAngle = 0;
 let targetCannonAngle = 0;
 
-let highScore = 0;
+let highScores = {
+    easy: 0,
+    normal: 0,
+    hard: 0
+};
 
 // VARIÁVEIS DE DIFICULDADE
 let difficultyLevel = 1;
@@ -252,14 +259,17 @@ function endGame() {
     isGameOver = true;
     clearInterval(spawnInterval);
 
-    highScoreGameOver.textContent = highScore;
+    // Mostra o recorde para a dificuldade atual
+    const currentHighScore = highScores[currentDifficulty];
+    highScoreGameOver.textContent = currentHighScore;
 
-    if (score > highScore) {
-        highScore = score;
-        localStorage.setItem('bubblePopHighScore', highScore);
-        highScoreGameOver.textContent = highScore;
-        newHighScoreMessage.style.display = 'block';
-        highScoreMenu.textContent = highScore;
+    // Verifica se a pontuação atual é um novo recorde PARA ESTA DIFICULDADE
+    if (score > currentHighScore) {
+        highScores[currentDifficulty] = score;
+        localStorage.setItem(`bubblePopHighScore_${currentDifficulty}`, score);
+
+        highScoreGameOver.textContent = score; // Atualiza o texto imediatamente
+        newHighScoreMessage.style.display = 'block'; // Mostra a mensagem de celebração
     }
 
     finalScoreDisplay.textContent = score;
@@ -373,16 +383,20 @@ function drawCannon() {
 
 
 function loadHighScore() {
-    const savedHighScore = localStorage.getItem('bubblePopHighScore');
-    if (savedHighScore) {
-        highScore = parseInt(savedHighScore);
-    }
-    highScoreMenu.textContent = highScore;
+    highScores.easy = parseInt(localStorage.getItem('bubblePopHighScore_easy')) || 0;
+    highScores.normal = parseInt(localStorage.getItem('bubblePopHighScore_normal')) || 0;
+    highScores.hard = parseInt(localStorage.getItem('bubblePopHighScore_hard')) || 0;
+}
+function updateDifficultyScreenScores() {
+    easyHighScoreDisplay.textContent = `Recorde: ${highScores.easy}`;
+    normalHighScoreDisplay.textContent = `Recorde: ${highScores.normal}`;
+    hardHighScoreDisplay.textContent = `Recorde: ${highScores.hard}`;
 }
 
 // --- Event Listeners ---
 // O botão Jogar agora abre o menu de dificuldade
 playButton.addEventListener('click', () => {
+    updateDifficultyScreenScores();
     menu.style.display = 'none';
     difficultyScreen.style.display = 'flex';
 });
@@ -442,4 +456,6 @@ aboutButton.addEventListener('click', () => {
 closeAboutButton.addEventListener('click', () => {
     aboutScreen.style.display = 'none'; // Esconde a janela "Sobre"
 });
+
 loadHighScore();
+updateDifficultyScreenScores();

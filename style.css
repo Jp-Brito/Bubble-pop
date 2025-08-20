@@ -54,6 +54,11 @@ button {
     border-radius: 10px;
     background-color: white;
     color: #444343;
+
+    display: flex;        
+    flex-direction: column;
+    align-items: center;  
+    justify-content: center;
 }
 
 /* Interface do jogo (pontos e vidas) */
@@ -199,4 +204,22 @@ button {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); }
+}
+
+#difficultyScreen h1 {
+    margin-bottom: 30px;
+}
+
+.difficulty-highscore {
+    font-size: 0.6em;
+    font-weight: bold; /* Deixamos o texto um pouco mais forte */
+    color: #FFFFFF; /* Cor branca, 100% opaca */
+    margin-top: 5px;
+    text-align: center;
+    /* Sombra subtil para criar separação do fundo */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); 
+}
+#difficultyScreen button {
+    width: 220px;          
+    margin-bottom: 10px;
 }
