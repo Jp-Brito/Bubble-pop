@@ -212,14 +212,13 @@ button {
 
 .difficulty-highscore {
     font-size: 0.6em;
-    font-weight: bold; /* Deixamos o texto um pouco mais forte */
-    color: #FFFFFF; /* Cor branca, 100% opaca */
+    font-weight: bold; 
+    color: #FFFFFF;
     margin-top: 5px;
     text-align: center;
-    /* Sombra subtil para criar separação do fundo */
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); 
 }
 #difficultyScreen button {
-    width: 220px;          
+    /* width: 220px;           */
     margin-bottom: 10px;
 }
