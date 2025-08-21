@@ -56,7 +56,6 @@ canvas.height = window.innerHeight;
 let score = 0;
 let lives = 5;
 let bubbles = []; // Array para guardar todas as bolhas
-let particles = [];
 let isGameOver = true;
 let isPaused = false; // Variável de estado para a pausa
 let spawnInterval; // Variável para controlar o intervalo de criação de bolhas
@@ -64,6 +63,10 @@ let currentDifficulty = 'normal';
 let cannonRecoil = 0;
 let currentCannonAngle = 0;
 let targetCannonAngle = 0;
+
+const particlesPool = [];
+const MAX_PARTICLES = 200;
+let particlePoolIndex = 0;
 
 let highScores = {
     easy: 0,
@@ -100,34 +103,60 @@ class Bubble {
     }
 }
 
+// Substitua a classe Particle inteira por esta
 class Particle {
-    constructor(x, y, color) {
+    constructor() {
+        this.active = false; // Começa inativa
+    }
+
+    // "init" é chamado para ativar uma partícula da piscina
+    init(x, y, color) {
+        this.active = true;
         this.x = x;
         this.y = y;
         this.color = color;
-        this.size = Math.random() * 5 + 2; // Tamanho entre 2 e 7
-        this.speedX = Math.random() * 6 - 3; // Velocidade horizontal aleatória (-3 a +3)
-        this.speedY = Math.random() * 6 - 3; // Velocidade vertical aleatória (-3 a +3)
-        this.life = 1; // Tempo de vida da partícula (1 = 100%)
+        this.size = Math.random() * 7 + 3; // Tamanho um pouco maior
+        this.life = 1;
+
+        const speed = Math.random() * 4 + 2; // Um pouco mais de força
+        const angle = Math.random() * Math.PI * 2;
+        this.speedX = Math.cos(angle) * speed;
+        this.speedY = Math.sin(angle) * speed;
     }
 
-    // Atualiza a posição e o tempo de vida
     update() {
+        // Se não estiver ativa, não faz nada
+        if (!this.active) return;
+
+        // Físicas
+        this.speedY += 0.1; // Gravidade
+        this.speedX *= 0.98; // Atrito
+        this.speedY *= 0.98;
+
         this.x += this.speedX;
         this.y += this.speedY;
-        this.life -= 0.04; // Desvanece gradualmente
+
+        this.life -= 0.03; // Desvanece
+
+        // Se o tempo de vida acabou, desativa a partícula
+        if (this.life <= 0) {
+            this.active = false;
+        }
     }
 
-    // Desenha a partícula no canvas
-    draw() {
-        ctx.save();
+     draw() {
+        if (!this.active) return;
         ctx.globalAlpha = this.life;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
-        // Desenha um quadrado em vez de um círculo (mais rápido)
-        ctx.fillRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
-        ctx.restore();
+        ctx.fill();
     }
 }
+
+for (let i = 0; i < MAX_PARTICLES; i++) {
+    particlesPool.push(new Particle());
+};
 
 function spawnBubble() {
     bubbles.push(new Bubble());
@@ -150,15 +179,23 @@ function handleBubbles() {
 }
 
 function handleParticles() {
-    for (let i = particles.length - 1; i >= 0; i--) {
-        particles[i].update();
-        particles[i].draw();
+    // Define a transparência uma vez ANTES do loop para otimização
+    ctx.globalAlpha = 1; 
 
-        // Se a partícula já "morreu" (vida < 0), remove-a do array
-        if (particles[i].life <= 0) {
-            particles.splice(i, 1);
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+        // Primeiro, atualiza a física de todas as partículas ativas
+        if (particlesPool[i].active) {
+            particlesPool[i].update();
         }
     }
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+        // Depois, desenha todas as partículas ativas
+        if (particlesPool[i].active) {
+            particlesPool[i].draw();
+        }
+    }
+    // Restaura a transparência para o padrão no final
+    ctx.globalAlpha = 1;
 }
 
 function gameLoop() {
@@ -250,6 +287,10 @@ function startGame() {
     gameUi.style.display = 'flex';
     newHighScoreMessage.style.display = 'none';
 
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+        particlesPool[i].active = false;
+    }
+
     updateUI();
     spawnInterval = setInterval(spawnBubble, spawnRate);
     gameLoop();
@@ -338,9 +379,12 @@ function handleInteraction(clickX, clickY) {
 }
 
 function createBurst(bubble) {
-    // Cria 15 partículas para a explosão
-    for (let i = 0; i < 5; i++) {
-        particles.push(new Particle(bubble.x, bubble.y, bubble.color));
+    const particleCount = 10; // Quantas partículas por explosão
+    for (let i = 0; i < particleCount; i++) {
+        // Pega na próxima partícula da piscina e a inicializa
+        particlesPool[particlePoolIndex].init(bubble.x, bubble.y, bubble.color);
+        // Avança o índice da piscina, voltando ao início se chegar ao fim
+        particlePoolIndex = (particlePoolIndex + 1) % MAX_PARTICLES;
     }
 }
 
