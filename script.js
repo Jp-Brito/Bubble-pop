@@ -171,8 +171,8 @@ class PowerUp {
         // ... (o resto da função draw continua exatamente igual)
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 0, 0)';
-        ctx.fill();
+        //ctx.fillStyle = 'rgba(255, 255, 0, 0)';
+        //ctx.fill();
         ctx.strokeStyle = 'white';
         ctx.lineWidth = 2;
         ctx.stroke();
@@ -549,7 +549,7 @@ function increaseDifficulty() {
 }
 
 function createBurst(bubble) {
-    const particleCount = 10;
+    const particleCount = 5;
     for (let i = 0; i < particleCount; i++) {
         particlesPool[particlePoolIndex].init(bubble.x, bubble.y, bubble.color);
         particlePoolIndex = (particlePoolIndex + 1) % PARTICLE_POOL_SIZE;
