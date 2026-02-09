@@ -749,6 +749,15 @@ function init() {
     showScreen('menu'); // Garante que a tela de menu seja a primeira a ser exibida.
 }
 
+// No final do script.js
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => console.log('Service Worker registado com sucesso!', reg))
+      .catch(err => console.log('Erro ao registar Service Worker:', err));
+  });
+}
+
 init(); // Inicia tudo!
 const backgroundMusic = document.getElementById('backgroundMusic');
 backgroundMusic.volume = 0.3; // Volume mais baixo para não atrapalhar
